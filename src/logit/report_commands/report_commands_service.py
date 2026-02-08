@@ -6,6 +6,7 @@ from logit.report_commands.report_commands_helper import (
     get_report_entries,
     get_entry_duration,
     _format_duration,
+    get_productivity_metrics,
 )
 
 
@@ -62,3 +63,56 @@ def report(days: int):
             )
 
     click.echo(f"\n⏱️  Total: {_format_duration(total_duration_all)}\n")
+
+
+@click.command()
+@click.option(
+    "--days",
+    "-d",
+    default=7,
+    help="Number of days to analyze (default: 7)",
+    type=int,
+)
+def analyze(days: int):
+    """Analyze productivity and focus quality."""
+    entries = get_report_entries(days=days)
+    metrics = get_productivity_metrics(entries)
+
+    if not metrics:
+        click.echo(f"\nNo data to analyze for the last {days} days.\n")
+        return
+
+    # Header
+    click.echo("")
+    header_text = click.style("🧠 Productivity Analysis", fg="yellow", bold=True)
+    click.echo(header_text)
+    click.echo("═" * 50)
+    click.echo("")
+
+    # Focus Quality Section
+    click.secho("Focus Quality", fg="blue", bold=True)
+
+    score = metrics["deep_work_score"]
+    score_styled = click.style(f"{score:.1f}%", fg="green", bold=True)
+    click.echo(f"Deep Work Score: {' ' * 19}{score_styled}")
+
+    # Progress Bar
+    bar_width = 40
+    filled_width = int((score / 100) * bar_width)
+    bar = click.style("█" * filled_width, fg="green")
+    empty = click.style("░" * (bar_width - filled_width), fg="green", dim=True)
+    click.echo(f"{bar}{empty}")
+
+    # Avg Session
+    avg_str = _format_duration(metrics["avg_session"])
+    avg_styled = click.style(avg_str, bold=True)
+    click.echo(f"Avg Session: {' ' * 19}{avg_styled}")
+
+    # Context Switching
+    switches = metrics["context_switches"]
+    switches_styled = click.style(
+        f"{switches:.1f} projects/day", fg="magenta" if switches > 3 else "cyan"
+    )
+    click.echo(f"Context Switching: {' ' * 15}{switches_styled}")
+
+    click.echo("")
