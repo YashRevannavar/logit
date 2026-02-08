@@ -19,8 +19,11 @@ logit start "coding" --tags canary
 # Stop tracking
 logit stop
 
-# Stop specific project or task
-logit stop "coding" -t "refactoring"
+# Generate report for today
+logit report
+
+# Generate report for last 7 days
+logit report --days 7
 ```
 
 ---
@@ -42,26 +45,28 @@ logit stop "coding" -t "refactoring"
 - **Local-First**: All data stays on your machine (stored in `~/.logit_data.jsonl`).
 - **Terminal-Native**: Built for developers who live in the CLI.
 - **Tagging Support**: Organize your entries with custom tags.
-- **FIFO Stop Logic**: Automatically stops the oldest running activity first.
-- **Filtering**: Target specific projects or tasks when stopping.
-- **Reporting**: Generate daily, weekly, or monthly summaries.
+- **Floating Duration**: Running activities show real-time duration in reports.
+- **Visual Reports**: Project-centric summaries with tracked intervals and task details.
 - **Lightweight**: Zero fluff, just tracking.
 
 ---
 
 ## 🏗️ Architecture
 ```text
-.
-├── README.md
-├── pyproject.toml
-├── requirements.txt
-└── src
-    └── logit
-        ├── cli.py              # CLI entry point
-        ├── control_commands.py # Business logic
-        ├── data_store.py      # File I/O (JSONL)
-        ├── models.py           # Data structures
-        └── __init__.py
+src/
+└── logit/
+    ├── cli.py                        # Entry point & Command registration
+    ├── control_commands/             # Start/Stop logic
+    │   ├── control_commands_helper.py
+    │   └── control_commands_service.py
+    ├── report_commands/              # Reporting logic
+    │   ├── report_commands_helper.py
+    │   └── report_commands_service.py
+    ├── data_storage/                 # Persistence layer
+    │   └── data_store.py
+    ├── utilities/                    # Shared models & config
+    │   └── models.py
+    └── __init__.py
 ```
 
 ---

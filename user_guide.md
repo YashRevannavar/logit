@@ -58,22 +58,45 @@ LogIt will display a summary of the session:
 - **Project & Task** details
 - **Tags** used
 - **Start & End** timestamps
-- **Total Duration** (formatted as `HH:MM:SS`)
+- **Total Duration** (formatted as `Xh YYm`)
 
 ---
 
 ### 3. `logit report`
-Generate a summary of your tracked time over a specific period. *(Note: Reports are currently a work in progress).*
+Generate a project-centric summary of your tracked time.
 
 **Usage:**
 ```bash
-logit report [day|week|month]
+logit report [OPTIONS]
 ```
+
+**Options:**
+- `-d, --days INTEGER`: Number of days to include in the report (default: 1).
 
 **Examples:**
 ```bash
-logit report day
-logit report week
+# Today's report
+logit report
+
+# Last 7 days
+logit report --days 7
+```
+
+**Output Format:**
+The report groups entries by project and lists tasks with their specific intervals and durations:
+
+```text
+📊 Time Tracking Report
+========================
+
+📁 Project-A: 2h 30m
+   01. [2026-02-08] 09:00 - 11:00 (2h 00m) | design
+   02. [2026-02-08] 14:00 - 14:30 (0h 30m) | refactor
+
+📁 Project-B: 1h 00m
+   01. [2026-02-08] 11:30 - Present (1h 00m) | coding
+
+⏱️  Total: 3h 30m
 ```
 
 ---
