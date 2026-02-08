@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import List
 
-from logit.models import LogItEntry, _entry_to_dict, _dict_to_entry
+from logit.utilities.models import LogItEntry, _entry_to_dict, _dict_to_entry
 
 
 def save_entry(entry: LogItEntry, file_path: Path) -> None:

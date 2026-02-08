@@ -2,7 +2,7 @@ import pytest
 import time
 from click.testing import CliRunner
 from logit.cli import cli
-from logit.models import user_config
+from logit.utilities.models import user_config
 
 
 @pytest.fixture

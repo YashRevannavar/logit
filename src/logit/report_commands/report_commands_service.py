@@ -2,10 +2,10 @@ from datetime import timedelta
 from collections import defaultdict
 import click
 
-from logit.display_format_helper import _format_duration
 from logit.report_commands.report_commands_helper import (
     get_report_entries,
     get_entry_duration,
+    _format_duration,
 )
 
 

@@ -1,7 +1,7 @@
 import click
 from logit.control_commands.control_commands_helper import start_command, stop_command
-from logit.display_format_helper import _format_duration
-from logit.models import LogItEntry, LogItStatus
+from logit.report_commands.report_commands_helper import _format_duration
+from logit.utilities.models import LogItEntry, LogItStatus
 
 
 @click.command()

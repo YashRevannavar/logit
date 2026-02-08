@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from logit.data_store import read_entries
-from logit.models import user_config, LogItStatus, LogItEntry
+from logit.data_storage.data_store import read_entries
+from logit.utilities.models import user_config, LogItStatus, LogItEntry
 
 
 def get_report_entries(days: int = 1) -> list[LogItEntry]:
@@ -22,3 +22,10 @@ def get_entry_duration(entry) -> timedelta:
     if entry.status == LogItStatus.RUNNING:
         return datetime.now() - entry.start_time
     return entry.duration
+
+
+def _format_duration(td: timedelta) -> str:
+    total_seconds = int(td.total_seconds())
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:d}h {minutes:02d}m"
