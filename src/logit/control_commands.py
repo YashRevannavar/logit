@@ -45,26 +45,41 @@ def stop_command(
 def get_report_data(days: int = 1):
     try:
         entries = read_entries(user_config.store_data_at_path)
+
         today = datetime.now().date()
         start_date = today - timedelta(days=days - 1)
 
-        # project_name -> total_duration
-        project_totals = {}
+        project_totals: dict[str, timedelta] = {}
 
         for entry in entries:
-            # We filter by the date of start_time
-            if entry.start_time.date() >= start_date:
+            if entry.start_time.date() < start_date:
+                continue
+
+            if entry.status == LogItStatus.RUNNING:
+                duration = datetime.now() - entry.start_time
+            else:
                 duration = entry.duration
-                if entry.status == LogItStatus.RUNNING:
-                    duration = datetime.now() - entry.start_time
 
-                if duration:
-                    project = entry.project
-                    if project not in project_totals:
-                        project_totals[project] = timedelta()
-                    project_totals[project] += duration
+            if not duration or duration.total_seconds() <= 0:
+                continue
 
-        return project_totals
+            project_totals.setdefault(entry.project, timedelta())
+            project_totals[entry.project] += duration
+
+        # Sort by duration (descending)
+        sorted_projects = sorted(
+            project_totals.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+
+        total_time = sum(project_totals.values(), timedelta())
+
+        return {
+            "total": total_time,
+            "projects": sorted_projects,
+        }
+
     except Exception as e:
         print(f"Error generating report: {e}")
-        return {}
+        return {"total": timedelta(), "projects": []}
