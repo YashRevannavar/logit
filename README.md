@@ -19,8 +19,8 @@ logit start "coding" --tags canary
 # Stop tracking
 logit stop
 
-# See history (WIP)
-logit report week
+# Stop specific project or task
+logit stop "coding" -t "refactoring"
 ```
 
 ---
@@ -39,23 +39,29 @@ logit report week
 ---
 
 ## ✨ Features
-- **Local-First**: All data stays on your machine.
+- **Local-First**: All data stays on your machine (stored in `~/.logit_data.jsonl`).
 - **Terminal-Native**: Built for developers who live in the CLI.
 - **Tagging Support**: Organize your entries with custom tags.
+- **FIFO Stop Logic**: Automatically stops the oldest running activity first.
+- **Filtering**: Target specific projects or tasks when stopping.
 - **Reporting**: Generate daily, weekly, or monthly summaries.
 - **Lightweight**: Zero fluff, just tracking.
 
 ---
 
 ## 🏗️ Architecture
-```mermaid
+```text
 .
 ├── README.md
-├── logit
-│   ├── __init__.py
-│   └── cli.py
 ├── pyproject.toml
 ├── requirements.txt
+└── src
+    └── logit
+        ├── cli.py              # CLI entry point
+        ├── control_commands.py # Business logic
+        ├── data_store.py      # File I/O (JSONL)
+        ├── models.py           # Data structures
+        └── __init__.py
 ```
 
 ---
@@ -104,41 +110,12 @@ If you want to contribute or modify the code:
 
 ## 📖 Usage Guide
 
-### Track Activity
-Start a new session with optional tags:
-```bash
-logit start "Refactoring UI" --tags frontend -t design
-```
-
-### Stop Session
-End the current active session:
-```bash
-logit stop
-```
-
-### Generate Reports
-View your logged time over different periods:
-```bash
-logit report day
-logit report week
-logit report month
-```
-
----
-
-## 🗺️ Roadmap
-- [ ] Persistent storage (JSON / JSONL)
-- [ ] `logit status` command
-- [ ] Config file support (`~/.config/logit/`)
-- [ ] Rich terminal output (tables, colors)
-- [ ] Export to CSV / ICS
-- [ ] Comprehensive test suite with `pytest`
-
+> Refer to the [User Guide](user_guide.md) for detailed instructions on how to use the available commands.
 ---
 
 ## 🧠 Philosophy
 - **Local-first**: Your data is yours. No cloud, no sync, no accounts.
-- **Plain files**: Human-readable storage (Planned).
+- **Plain files**: Human-readable storage (JSONL).
 - **Simplicity**: No complex UI, just simple commands.
 - **Developer-focused**: Integration with your existing workflow.
 
