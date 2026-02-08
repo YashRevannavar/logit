@@ -144,3 +144,9 @@ rm -rf .venv
 ---
 
 **Happy logging! ⏱️**
+
+
+This project is inspired by the `tock` time tracking tool
+(https://github.com/kriuchkov/tock), originally written in Go.
+
+This is an independent reimplementation written from scratch in Python.
