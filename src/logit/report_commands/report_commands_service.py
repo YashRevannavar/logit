@@ -1,11 +1,15 @@
+from datetime import timedelta
+from collections import defaultdict
 import click
 
-from logit.cli import cli
-from logit.control_commands.control_commands_helper import get_report_data
-from logit.display_format_helper import _format_duration, _render_bar
+from logit.display_format_helper import _format_duration
+from logit.report_commands.report_commands_helper import (
+    get_report_entries,
+    get_entry_duration,
+)
 
 
-@cli.command()
+@click.command()
 @click.option(
     "--days",
     "-d",
@@ -14,29 +18,47 @@ from logit.display_format_helper import _format_duration, _render_bar
     type=int,
 )
 def report(days: int):
-    """Show a time report."""
-    click.echo(f"\n📊 REPORT (last {days} day{'s' if days > 1 else ''})")
-    click.echo("─" * 50)
+    """Show a compact time tracking report."""
+    entries = get_report_entries(days=days)
 
-    report_data = get_report_data(days=days)
-
-    total_time = report_data["total"]
-    projects = report_data["projects"]
-
-    if not projects or total_time.total_seconds() == 0:
-        click.echo("No tracked time found for this period.\n")
+    if not entries:
+        click.echo(
+            f"\nNo tracked time found for the last {days} day{'s' if days > 1 else ''}.\n"
+        )
         return
 
-    click.echo(f"Total tracked time: {_format_duration(total_time)}\n")
-    click.echo("Project breakdown:")
-    click.echo("─" * 50)
-    click.echo(f"{'PROJECT':<10}  {'ACTIVITY':<19}  {'SHARE':>4}  {'TIME':>4}")
-    click.echo(f"{'-' * 10}  {'-' * 19}  {'-' * 5}  {'-' * 6}")
-    for project, duration in projects:
-        ratio = duration / total_time
-        bar = _render_bar(ratio)
-        percent = int(ratio * 100)
-        duration_str = _format_duration(duration)
-        click.echo(f"{project:<10} {bar}  {percent:>3}%  {duration_str}")
+    click.echo("\n📊 Time Tracking Report")
+    click.echo("=" * 24)
 
-    click.echo("")
+    # Group by project
+    project_groups = defaultdict(list)
+    for entry in entries:
+        project_groups[entry.project].append(entry)
+
+    total_duration_all = timedelta()
+
+    # Sort projects by name
+    for project_name in sorted(project_groups.keys()):
+        project_entries = project_groups[project_name]
+
+        # Calculate total for this project
+        project_total = timedelta()
+        for entry in project_entries:
+            project_total += get_entry_duration(entry)
+
+        total_duration_all += project_total
+
+        click.echo(f"\n📁 {project_name}: {_format_duration(project_total)}")
+
+        # List tasks
+        for i, entry in enumerate(project_entries, 1):
+            duration = get_entry_duration(entry)
+            date_str = entry.start_time.strftime("%Y-%m-%d")
+            start_str = entry.start_time.strftime("%H:%M")
+            end_str = entry.end_time.strftime("%H:%M") if entry.end_time else "Present"
+
+            click.echo(
+                f"   {i:02d}. [{date_str}] {start_str} - {end_str} ({_format_duration(duration)}) | {entry.task or 'no task'}"
+            )
+
+    click.echo(f"\n⏱️  Total: {_format_duration(total_duration_all)}\n")
