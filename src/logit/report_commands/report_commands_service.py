@@ -28,7 +28,8 @@ def report(days: int):
         )
         return
 
-    click.echo("\n📊 Time Tracking Report")
+    click.echo("")
+    click.secho("📊 Time Tracking Report", fg="blue", bold=True)
     click.echo("=" * 24)
 
     # Group by project
@@ -49,20 +50,33 @@ def report(days: int):
 
         total_duration_all += project_total
 
-        click.echo(f"\n📁 {project_name}: {_format_duration(project_total)}")
+        project_label = click.style(f"📁 {project_name}:", fg="cyan", bold=True)
+        duration_label = click.style(_format_duration(project_total), bold=True)
+        click.echo(f"\n{project_label} {duration_label}")
 
         # List tasks
         for i, entry in enumerate(project_entries, 1):
             duration = get_entry_duration(entry)
-            date_str = entry.start_time.strftime("%Y-%m-%d")
+            date_str = click.style(entry.start_time.strftime("%Y-%m-%d"), dim=True)
             start_str = entry.start_time.strftime("%H:%M")
-            end_str = entry.end_time.strftime("%H:%M") if entry.end_time else "Present"
-
-            click.echo(
-                f"   {i:02d}. [{date_str}] {start_str} - {end_str} ({_format_duration(duration)}) | {entry.task or 'no task'}"
+            end_str = (
+                entry.end_time.strftime("%H:%M")
+                if entry.end_time
+                else click.style("Present", fg="yellow")
             )
 
-    click.echo(f"\n⏱️  Total: {_format_duration(total_duration_all)}\n")
+            idx = click.style(f"{i:02d}.", fg="green")
+            dur_str = click.style(f"({_format_duration(duration)})", dim=True)
+
+            task_desc = entry.task or click.style("no task", dim=True)
+
+            click.echo(
+                f"   {idx} [{date_str}] {start_str} - {end_str} {dur_str} | {task_desc}"
+            )
+
+    total_label = click.style("⏱️  Total:", fg="yellow", bold=True)
+    total_val = click.style(_format_duration(total_duration_all), bold=True)
+    click.echo(f"\n{total_label} {total_val}\n")
 
 
 @click.command()
