@@ -5,9 +5,9 @@ import click
 from logit.report_commands.report_commands_helper import (
     get_report_entries,
     get_entry_duration,
-    _format_duration,
     get_productivity_metrics,
 )
+from logit.utilities.display_utils import format_duration
 
 
 @click.command()
@@ -51,7 +51,7 @@ def report(days: int):
         total_duration_all += project_total
 
         project_label = click.style(f"📁 {project_name}:", fg="cyan", bold=True)
-        duration_label = click.style(_format_duration(project_total), bold=True)
+        duration_label = click.style(format_duration(project_total), bold=True)
         click.echo(f"\n{project_label} {duration_label}")
 
         # List tasks
@@ -66,7 +66,7 @@ def report(days: int):
             )
 
             idx = click.style(f"{i:02d}.", fg="green")
-            dur_str = click.style(f"({_format_duration(duration)})", dim=True)
+            dur_str = click.style(f"({format_duration(duration)})", dim=True)
 
             task_desc = entry.task or click.style("no task", dim=True)
 
@@ -75,7 +75,7 @@ def report(days: int):
             )
 
     total_label = click.style("⏱️  Total:", fg="yellow", bold=True)
-    total_val = click.style(_format_duration(total_duration_all), bold=True)
+    total_val = click.style(format_duration(total_duration_all), bold=True)
     click.echo(f"\n{total_label} {total_val}\n")
 
 
@@ -106,7 +106,7 @@ def analyze(days: int):
     # Focus Quality Section
     click.secho("Focus Quality", fg="blue", bold=True)
 
-    score = metrics["deep_work_score"]
+    score = metrics.deep_work_score
     score_styled = click.style(f"{score:.1f}%", fg="green", bold=True)
     click.echo(f"Deep Work Score: {' ' * 19}{score_styled}")
 
@@ -118,12 +118,12 @@ def analyze(days: int):
     click.echo(f"{bar}{empty}")
 
     # Avg Session
-    avg_str = _format_duration(metrics["avg_session"])
+    avg_str = format_duration(metrics.avg_session)
     avg_styled = click.style(avg_str, bold=True)
     click.echo(f"Avg Session: {' ' * 19}{avg_styled}")
 
     # Context Switching
-    switches = metrics["context_switches"]
+    switches = metrics.context_switches
     switches_styled = click.style(
         f"{switches:.1f} projects/day", fg="magenta" if switches > 3 else "cyan"
     )
@@ -133,16 +133,17 @@ def analyze(days: int):
 
     # Session Distribution Section
     click.secho("Session Distribution", fg="blue", bold=True)
-    dist = metrics["distribution"]
+    dist = metrics.distribution
 
-    max_count = max(dist.values()) if dist.values() else 1
+    counts = [dist.fragmented, dist.flow, dist.deep_focus]
+    max_count = max(counts) if any(counts) else 1
     # Scale width based on max count, max bar width 30
     scale = 30 / max_count if max_count > 0 else 1
 
     categories = [
-        ("Fragmented (<15m)", dist["fragmented"], "white"),  # dimmed white
-        ("Flow (15m-1h)    ", dist["flow"], "blue"),
-        ("Deep Focus (>1h) ", dist["deep_focus"], "green"),
+        ("Fragmented (<15m)", dist.fragmented, "white"),  # dimmed white
+        ("Flow (15m-1h)    ", dist.flow, "blue"),
+        ("Deep Focus (>1h) ", dist.deep_focus, "green"),
     ]
 
     for label, count, color in categories:

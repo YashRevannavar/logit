@@ -22,8 +22,8 @@ logit stop
 # Generate report for today
 logit report
 
-# Generate report for last 7 days
-logit report --days 7
+# Deep productivity analysis (last 30 days)
+logit analyze --days 30
 ```
 
 ---
@@ -47,6 +47,7 @@ logit report --days 7
 - **Tagging Support**: Organize your entries with custom tags.
 - **Floating Duration**: Running activities show real-time duration in reports.
 - **Visual Reports**: Project-centric summaries with tracked intervals and task details.
+- **Productivity Analysis**: Insightful metrics like "Deep Work Score" and "Session Distribution."
 - **Lightweight**: Zero fluff, just tracking.
 
 ---
@@ -62,10 +63,11 @@ src/
     ├── report_commands/              # Reporting logic
     │   ├── report_commands_helper.py
     │   └── report_commands_service.py
-    ├── data_storage/                 # Persistence layer
+    ├── data_storage/                 # Persistence layer (JSONL)
     │   └── data_store.py
-    ├── utilities/                    # Shared models & config
-    │   └── models.py
+    ├── utilities/                    # Shared infrastructure
+    │   ├── models.py                 # Dataclasses & Enums
+    │   └── display_utils.py          # Color & Formatting helpers
     └── __init__.py
 ```
 

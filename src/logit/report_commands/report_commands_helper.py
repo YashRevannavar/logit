@@ -1,7 +1,14 @@
 from datetime import datetime, timedelta
 from collections import defaultdict
+from typing import Optional
 from logit.data_storage.data_store import read_entries
-from logit.utilities.models import user_config, LogItStatus, LogItEntry
+from logit.utilities.models import (
+    user_config,
+    LogItStatus,
+    LogItEntry,
+    ProductivityMetrics,
+    SessionDistribution,
+)
 
 
 def get_report_entries(days: int = 1) -> list[LogItEntry]:
@@ -22,6 +29,7 @@ def get_entry_duration(entry) -> timedelta:
     """Calculate duration, accounting for running tasks."""
     if entry.status == LogItStatus.RUNNING:
         return datetime.now() - entry.start_time
+    # handle None duration
     if entry.duration:
         return entry.duration
     return timedelta()
@@ -58,7 +66,9 @@ def calculate_deep_work_score(entries: list[LogItEntry]) -> float:
     return (deep_work_time.total_seconds() / total_time.total_seconds()) * 100
 
 
-def get_productivity_metrics(entries: list[LogItEntry]):
+def get_productivity_metrics(
+    entries: list[LogItEntry],
+) -> Optional[ProductivityMetrics]:
     """Calculate deep work score, average session length, context switching, and session distribution."""
     if not entries:
         return None
@@ -70,11 +80,7 @@ def get_productivity_metrics(entries: list[LogItEntry]):
     projects_per_day = defaultdict(set)
 
     # Session distribution categories
-    distribution = {
-        "fragmented": 0,  # <15m
-        "flow": 0,  # 15m-1h
-        "deep_focus": 0,  # >1h
-    }
+    distribution = SessionDistribution()
 
     for entry in entries:
         duration = get_entry_duration(entry)
@@ -88,11 +94,11 @@ def get_productivity_metrics(entries: list[LogItEntry]):
 
             # Categorize session
             if seconds < 15 * 60:
-                distribution["fragmented"] += 1
+                distribution.fragmented += 1
             elif seconds < 60 * 60:
-                distribution["flow"] += 1
+                distribution.flow += 1
             else:
-                distribution["deep_focus"] += 1
+                distribution.deep_focus += 1
 
     if total_duration.total_seconds() == 0:
         return None
@@ -106,18 +112,11 @@ def get_productivity_metrics(entries: list[LogItEntry]):
         else 0
     )
 
-    return {
-        "deep_work_score": deep_work_score,
-        "avg_session": avg_session,
-        "total_time": total_duration,
-        "session_count": sessions_count,
-        "context_switches": context_switches,
-        "distribution": distribution,
-    }
-
-
-def _format_duration(td: timedelta) -> str:
-    total_seconds = int(td.total_seconds())
-    hours, remainder = divmod(total_seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return f"{hours:d}h {minutes:02d}m"
+    return ProductivityMetrics(
+        deep_work_score=deep_work_score,
+        avg_session=avg_session,
+        total_time=total_duration,
+        session_count=sessions_count,
+        context_switches=context_switches,
+        distribution=distribution,
+    )

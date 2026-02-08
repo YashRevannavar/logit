@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from logit.data_storage.data_store import save_entry, read_entries, save_entries
 from logit.utilities.models import user_config, LogItEntry, LogItStatus
 
@@ -40,46 +40,3 @@ def stop_command(
     except Exception as e:
         print(f"Error stopping activity: {e}")
         return None
-
-
-def get_report_data(days: int = 1):
-    try:
-        entries = read_entries(user_config.store_data_at_path)
-
-        today = datetime.now().date()
-        start_date = today - timedelta(days=days - 1)
-
-        project_totals: dict[str, timedelta] = {}
-
-        for entry in entries:
-            if entry.start_time.date() < start_date:
-                continue
-
-            if entry.status == LogItStatus.RUNNING:
-                duration = datetime.now() - entry.start_time
-            else:
-                duration = entry.duration
-
-            if not duration or duration.total_seconds() <= 0:
-                continue
-
-            project_totals.setdefault(entry.project, timedelta())
-            project_totals[entry.project] += duration
-
-        # Sort by duration (descending)
-        sorted_projects = sorted(
-            project_totals.items(),
-            key=lambda x: x[1],
-            reverse=True,
-        )
-
-        total_time = sum(project_totals.values(), timedelta())
-
-        return {
-            "total": total_time,
-            "projects": sorted_projects,
-        }
-
-    except Exception as e:
-        print(f"Error generating report: {e}")
-        return {"total": timedelta(), "projects": []}

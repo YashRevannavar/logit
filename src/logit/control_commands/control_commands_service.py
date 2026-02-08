@@ -1,6 +1,7 @@
 import click
 from logit.control_commands.control_commands_helper import start_command, stop_command
-from logit.report_commands.report_commands_helper import _format_duration
+from logit.utilities.display_utils import format_duration
+
 from logit.utilities.models import LogItEntry, LogItStatus
 
 
@@ -67,5 +68,5 @@ def stop(project: str | None, task: str | None):
     click.echo(f"  End      : {entry.end_time.isoformat(timespec='seconds')}")
 
     if entry.duration:
-        duration_str = _format_duration(entry.duration)
+        duration_str = format_duration(entry.duration)
         click.echo(f"  Duration : {duration_str}")

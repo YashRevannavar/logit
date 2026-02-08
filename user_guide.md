@@ -101,7 +101,46 @@ The report groups entries by project and lists tasks with their specific interva
 
 ---
 
-### 4. `logit --help`
+### 4. `logit analyze`
+Take a deep dive into your productivity patterns.
+
+**Usage:**
+```bash
+logit analyze [OPTIONS]
+```
+
+**Options:**
+- `-d, --days INTEGER`: Number of days to analyze (default: 7).
+
+**What's inside?**
+- **Deep Work Score**: Percentage of time spent in focused sessions ($\ge$ 45 min).
+- **Average Session**: Your median session length.
+- **Context Switching**: Average number of unique projects you switch between per day.
+- **Session Distribution**: A visual bar chart showing your work intensity:
+    - **Fragmented**: Short bursts or interruptions (<15m).
+    - **Flow**: Solid blocks of consistent work (15m-1h).
+    - **Deep Focus**: High-intensity long sessions (>1h).
+
+**Example Output:**
+```text
+🧠 Productivity Analysis
+══════════════════════════════════════════════════
+
+Focus Quality
+Deep Work Score:                    95.2%
+██████████████████████████████████████░░
+Avg Session:                    1h 12m
+Context Switching:                2.7 projects/day
+
+Session Distribution
+Fragmented (<15m)  ████ 3
+Flow (15m-1h)      ███████████ 8
+Deep Focus (>1h)   ██████████████████████████████ 21
+```
+
+---
+
+### 5. `logit --help`
 Need a quick reminder? You can always use the help flag to see available commands and options directly in your terminal.
 
 ```bash
