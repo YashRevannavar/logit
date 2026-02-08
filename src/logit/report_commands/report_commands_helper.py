@@ -59,7 +59,7 @@ def calculate_deep_work_score(entries: list[LogItEntry]) -> float:
 
 
 def get_productivity_metrics(entries: list[LogItEntry]):
-    """Calculate deep work score, average session length, and context switching."""
+    """Calculate deep work score, average session length, context switching, and session distribution."""
     if not entries:
         return None
 
@@ -69,13 +69,30 @@ def get_productivity_metrics(entries: list[LogItEntry]):
     sessions_count = 0
     projects_per_day = defaultdict(set)
 
+    # Session distribution categories
+    distribution = {
+        "fragmented": 0,  # <15m
+        "flow": 0,  # 15m-1h
+        "deep_focus": 0,  # >1h
+    }
+
     for entry in entries:
         duration = get_entry_duration(entry)
-        if duration.total_seconds() > 0:
+        seconds = duration.total_seconds()
+
+        if seconds > 0:
             total_duration += duration
             sessions_count += 1
             day = entry.start_time.date()
             projects_per_day[day].add(entry.project)
+
+            # Categorize session
+            if seconds < 15 * 60:
+                distribution["fragmented"] += 1
+            elif seconds < 60 * 60:
+                distribution["flow"] += 1
+            else:
+                distribution["deep_focus"] += 1
 
     if total_duration.total_seconds() == 0:
         return None
@@ -95,6 +112,7 @@ def get_productivity_metrics(entries: list[LogItEntry]):
         "total_time": total_duration,
         "session_count": sessions_count,
         "context_switches": context_switches,
+        "distribution": distribution,
     }
 
 

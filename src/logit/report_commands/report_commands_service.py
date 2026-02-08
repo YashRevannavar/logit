@@ -116,3 +116,28 @@ def analyze(days: int):
     click.echo(f"Context Switching: {' ' * 15}{switches_styled}")
 
     click.echo("")
+
+    # Session Distribution Section
+    click.secho("Session Distribution", fg="blue", bold=True)
+    dist = metrics["distribution"]
+
+    max_count = max(dist.values()) if dist.values() else 1
+    # Scale width based on max count, max bar width 30
+    scale = 30 / max_count if max_count > 0 else 1
+
+    categories = [
+        ("Fragmented (<15m)", dist["fragmented"], "white"),  # dimmed white
+        ("Flow (15m-1h)    ", dist["flow"], "blue"),
+        ("Deep Focus (>1h) ", dist["deep_focus"], "green"),
+    ]
+
+    for label, count, color in categories:
+        bar_len = int(count * scale)
+        if label.startswith("Fragmented"):
+            bar = click.style("█" * bar_len, fg="white", dim=True)
+        else:
+            bar = click.style("█" * bar_len, fg=color)
+
+        click.echo(f"{label}  {bar} {click.style(str(count), dim=True)}")
+
+    click.echo("")
