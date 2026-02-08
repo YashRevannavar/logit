@@ -1,11 +1,12 @@
 import click
 from logit.models import LogItEntry, LogItStatus
-from logit.control_commands import start_command, stop_command
+from logit.control_commands import start_command, stop_command, get_report_data
+
+from logit.display_format_helper import _format_duration
 
 
 # TODO: Implement stop_command / Update operation
 # TODO: Implement list command / Read operation
-# TODO: Implement report command / Read operation
 # TODO: Implement specific entry editing commands / Update operation
 
 
@@ -77,22 +78,30 @@ def stop(project: str | None, task: str | None):
     click.echo(f"  End      : {entry.end_time.isoformat(timespec='seconds')}")
 
     if entry.duration:
-        # Format duration to HH:MM:SS
-        total_seconds = int(
-            entry.duration.total_seconds()
-        )  # TODO: handle the printing in different .py file later
-        hours, remainder = divmod(total_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        duration_str = f"{hours:02}:{minutes:02}:{seconds:02}"
+        duration_str = _format_duration(entry.duration)
         click.echo(f"  Duration : {duration_str}")
 
 
 @cli.command()
-@click.argument(
-    "period",
-    type=click.Choice(["day", "week", "month"], case_sensitive=False),
+@click.option(
+    "--days",
+    "-d",
+    default=1,
+    help="Number of days to include in the report (default: 1)",
+    type=int,
 )
-def report(period: str):
+def report(days: int):
     """Show a time report."""
-    click.echo(f"📊 REPORT ({period.upper()})")
-    click.echo("  (not implemented yet)")
+    click.echo(f"📊 REPORT ({days} day{'s' if days > 1 else ''})")
+
+    report_data = get_report_data(days=days)
+
+    if not report_data:
+        click.echo("  (no data found for this period)")
+        return
+
+    # Sort projects by name
+    for project in sorted(report_data.keys()):
+        duration = report_data[project]
+        duration_str = _format_duration(duration)
+        click.echo(f"  {project:<15} : {duration_str}")
