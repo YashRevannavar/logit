@@ -83,8 +83,8 @@ def report(days: int):
 @click.option(
     "--days",
     "-d",
-    default=7,
-    help="Number of days to analyze (default: 7)",
+    default=1,
+    help="Number of days to analyze (default: 1)",
     type=int,
 )
 def analyze(days: int):
