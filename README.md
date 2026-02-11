@@ -19,8 +19,11 @@ logit start "coding" --tags canary
 # Stop tracking
 logit stop
 
-# See history (WIP)
-logit report week
+# Generate report for today
+logit report
+
+# Deep productivity analysis (last 30 days)
+logit analyze --days 30
 ```
 
 ---
@@ -39,23 +42,33 @@ logit report week
 ---
 
 ## ✨ Features
-- **Local-First**: All data stays on your machine.
+- **Local-First**: All data stays on your machine (stored in `~/.logit_data.jsonl`).
 - **Terminal-Native**: Built for developers who live in the CLI.
 - **Tagging Support**: Organize your entries with custom tags.
-- **Reporting**: Generate daily, weekly, or monthly summaries.
+- **Floating Duration**: Running activities show real-time duration in reports.
+- **Visual Reports**: Project-centric summaries with tracked intervals and task details.
+- **Productivity Analysis**: Insightful metrics like "Deep Work Score" and "Session Distribution."
 - **Lightweight**: Zero fluff, just tracking.
 
 ---
 
 ## 🏗️ Architecture
-```mermaid
-.
-├── README.md
-├── logit
-│   ├── __init__.py
-│   └── cli.py
-├── pyproject.toml
-├── requirements.txt
+```text
+src/
+└── logit/
+    ├── cli.py                        # Entry point & Command registration
+    ├── control_commands/             # Start/Stop logic
+    │   ├── control_commands_helper.py
+    │   └── control_commands_service.py
+    ├── report_commands/              # Reporting logic
+    │   ├── report_commands_helper.py
+    │   └── report_commands_service.py
+    ├── data_storage/                 # Persistence layer (JSONL)
+    │   └── data_store.py
+    ├── utilities/                    # Shared infrastructure
+    │   ├── models.py                 # Dataclasses & Enums
+    │   └── display_utils.py          # Color & Formatting helpers
+    └── __init__.py
 ```
 
 ---
@@ -104,41 +117,12 @@ If you want to contribute or modify the code:
 
 ## 📖 Usage Guide
 
-### Track Activity
-Start a new session with optional tags:
-```bash
-logit start "Refactoring UI" --tags frontend -t design
-```
-
-### Stop Session
-End the current active session:
-```bash
-logit stop
-```
-
-### Generate Reports
-View your logged time over different periods:
-```bash
-logit report day
-logit report week
-logit report month
-```
-
----
-
-## 🗺️ Roadmap
-- [ ] Persistent storage (JSON / JSONL)
-- [ ] `logit status` command
-- [ ] Config file support (`~/.config/logit/`)
-- [ ] Rich terminal output (tables, colors)
-- [ ] Export to CSV / ICS
-- [ ] Comprehensive test suite with `pytest`
-
+> Refer to the [User Guide](user_guide.md) for detailed instructions on how to use the available commands.
 ---
 
 ## 🧠 Philosophy
 - **Local-first**: Your data is yours. No cloud, no sync, no accounts.
-- **Plain files**: Human-readable storage (Planned).
+- **Plain files**: Human-readable storage (JSONL).
 - **Simplicity**: No complex UI, just simple commands.
 - **Developer-focused**: Integration with your existing workflow.
 
@@ -160,3 +144,9 @@ rm -rf .venv
 ---
 
 **Happy logging! ⏱️**
+
+
+This project is inspired by the `tock` time tracking tool
+(https://github.com/kriuchkov/tock), originally written in Go.
+
+This is an independent reimplementation written from scratch in Python.
