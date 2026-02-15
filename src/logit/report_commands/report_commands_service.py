@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 from collections import defaultdict
 import click
@@ -7,6 +8,7 @@ from logit.report_commands.report_commands_helper import (
     get_entry_duration,
     get_productivity_metrics,
 )
+from logit.utilities.models import _entry_to_dict
 from logit.utilities.display_utils import format_duration
 
 
@@ -18,9 +20,20 @@ from logit.utilities.display_utils import format_duration
     help="Number of days to include in the report (default: 1)",
     type=int,
 )
-def report(days: int):
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Output report in JSON format",
+)
+def report(days: int, json_output: bool):
     """Show a compact time tracking report."""
     entries = get_report_entries(days=days)
+
+    if json_output:
+        data = [_entry_to_dict(e) for e in entries]
+        click.echo(json.dumps(data, indent=2))
+        return
 
     if not entries:
         click.echo(
@@ -50,9 +63,9 @@ def report(days: int):
 
         total_duration_all += project_total
 
-        project_label = click.style(f"📁 {project_name}:", fg="cyan", bold=True)
+        project_label = click.style(f"📁 {project_name}", fg="cyan", bold=True)
         duration_label = click.style(format_duration(project_total), bold=True)
-        click.echo(f"\n{project_label} {duration_label}")
+        click.echo(f"\n{project_label}  {duration_label}")
 
         # List tasks
         for i, entry in enumerate(project_entries, 1):
@@ -87,10 +100,23 @@ def report(days: int):
     help="Number of days to analyze (default: 1)",
     type=int,
 )
-def analyze(days: int):
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Output analysis in JSON format",
+)
+def analyze(days: int, json_output: bool):
     """Analyze productivity and focus quality."""
     entries = get_report_entries(days=days)
     metrics = get_productivity_metrics(entries)
+
+    if json_output:
+        if metrics:
+            click.echo(json.dumps(metrics.to_dict(), indent=2))
+        else:
+            click.echo(json.dumps({}, indent=2))
+        return
 
     if not metrics:
         click.echo(f"\nNo data to analyze for the last {days} days.\n")

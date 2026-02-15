@@ -30,16 +30,15 @@ def start(project: str, task: str | None, tag: tuple[str]):
     )
 
     if not start_command(entry=entry):
-        click.echo("Error starting activity. Please try again.")
-        return
+        raise click.ClickException("Error starting activity. Please try again.")
 
-    click.echo("▶ START")
-    click.echo(f"  Project  : {project}")
+    click.secho("▶ START", fg="green", bold=True)
+    click.echo(f"  Project  : {click.style(project, bold=True)}")
     if task:
         click.echo(f"  Task     : {task}")
     if tags:
         click.echo(f"  Tags     : {', '.join(tags)}")
-    click.echo(f"  Time     : {entry.start_time.isoformat(timespec='seconds')}")
+    click.echo(f"  Time     : {entry.start_time.strftime('%H:%M:%S')}")
 
 
 @click.command()
@@ -54,19 +53,19 @@ def stop(project: str | None, task: str | None):
     entry = stop_command(project=project, task=task)
 
     if not entry:
-        click.echo("No running activity found.")
-        return
+        raise click.ClickException("No running activity found.")
 
-    click.echo("■ STOP")
-    click.echo(f"  Project  : {entry.project}")
+    click.secho("■ STOP", fg="red", bold=True)
+    click.echo(f"  Project  : {click.style(entry.project, bold=True)}")
     if entry.task:
         click.echo(f"  Task     : {entry.task}")
     if entry.tags:
         click.echo(f"  Tags     : {', '.join(entry.tags)}")
 
-    click.echo(f"  Start    : {entry.start_time.isoformat(timespec='seconds')}")
-    click.echo(f"  End      : {entry.end_time.isoformat(timespec='seconds')}")
+    click.echo(f"  Start    : {entry.start_time.strftime('%H:%M:%S')}")
+    if entry.end_time:
+        click.echo(f"  End      : {entry.end_time.strftime('%H:%M:%S')}")
 
     if entry.duration:
         duration_str = format_duration(entry.duration)
-        click.echo(f"  Duration : {duration_str}")
+        click.echo(f"  Duration : {click.style(duration_str, bold=True)}")

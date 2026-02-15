@@ -1,11 +1,6 @@
 import click
 
 
-# TODO: Implement stop_command / Update operation
-# TODO: Implement list command / Read operation
-# TODO: Implement specific entry editing commands / Update operation
-
-
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 def cli():
     """logit — a terminal-first time tracking tool."""

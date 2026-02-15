@@ -80,6 +80,16 @@ class ProductivityMetrics:
     context_switches: float
     distribution: SessionDistribution
 
+    def to_dict(self) -> dict:
+        return {
+            "deep_work_score": self.deep_work_score,
+            "avg_session_seconds": self.avg_session.total_seconds(),
+            "total_time_seconds": self.total_time.total_seconds(),
+            "session_count": self.session_count,
+            "context_switches": self.context_switches,
+            "distribution": asdict(self.distribution),
+        }
+
 
 user_config = UserConfig(
     time_format="24h",
