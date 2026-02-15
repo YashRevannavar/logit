@@ -1,6 +1,6 @@
 from datetime import datetime
-from logit.data_store import save_entry, read_entries, save_entries
-from logit.models import user_config, LogItEntry, LogItStatus
+from logit.data_storage.data_store import save_entry, read_entries, save_entries
+from logit.utilities.models import user_config, LogItEntry, LogItStatus
 
 
 def start_command(entry: LogItEntry) -> bool:

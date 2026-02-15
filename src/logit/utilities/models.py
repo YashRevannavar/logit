@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field, asdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict
 
 
 class LogItStatus(Enum):
@@ -59,6 +59,26 @@ class UserConfig:
     def __post_init__(self):
         if self.time_format not in ["12h", "24h"]:
             raise ValueError("time_format must be either '12h' or '24h'")
+
+
+@dataclass
+class SessionDistribution:
+    fragmented: int = 0
+    flow: int = 0
+    deep_focus: int = 0
+
+    def as_dict(self) -> Dict[str, int]:
+        return asdict(self)
+
+
+@dataclass
+class ProductivityMetrics:
+    deep_work_score: float
+    avg_session: timedelta
+    total_time: timedelta
+    session_count: int
+    context_switches: float
+    distribution: SessionDistribution
 
 
 user_config = UserConfig(
