@@ -24,6 +24,9 @@ logit report
 
 # Deep productivity analysis (last 30 days)
 logit analyze --days 30
+
+# Export report as JSON
+logit report --json
 ```
 
 ---
@@ -48,6 +51,7 @@ logit analyze --days 30
 - **Floating Duration**: Running activities show real-time duration in reports.
 - **Visual Reports**: Project-centric summaries with tracked intervals and task details.
 - **Productivity Analysis**: Insightful metrics like "Deep Work Score" and "Session Distribution."
+- **JSON Output**: Machine-readable output for reports and analysis.
 - **Lightweight**: Zero fluff, just tracking.
 
 ---

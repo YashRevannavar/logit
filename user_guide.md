@@ -72,6 +72,7 @@ logit report [OPTIONS]
 
 **Options:**
 - `-d, --days INTEGER`: Number of days to include in the report (default: 1).
+- `--json`: Output report in JSON format.
 
 **Examples:**
 ```bash
@@ -111,6 +112,7 @@ logit analyze [OPTIONS]
 
 **Options:**
 - `-d, --days INTEGER`: Number of days to analyze (default: 7).
+- `--json`: Output analysis in JSON format.
 
 **What's inside?**
 - **Deep Work Score**: Percentage of time spent in focused sessions ($\ge$ 45 min).
