@@ -78,7 +78,7 @@ def report(days: int, json_output: bool):
                 else click.style("Present", fg="yellow")
             )
 
-            idx = click.style(f"{i:02d}.", fg="green")
+            idx = click.style(f"{i}.", fg="green")
             dur_str = click.style(f"({format_duration(duration)})", dim=True)
 
             task_desc = entry.task or click.style("no task", dim=True)
@@ -227,7 +227,7 @@ def ls(days: int, json_output: bool):
             else click.style("Present", fg="yellow")
         )
 
-        idx = click.style(f"{i:02d}.", fg="green")
+        idx = click.style(f"{i}.", fg="green")
         dur_str = click.style(f"({format_duration(duration)})", dim=True)
 
         task_desc = entry.task or click.style("no task", dim=True)
