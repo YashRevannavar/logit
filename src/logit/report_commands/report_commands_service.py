@@ -78,7 +78,7 @@ def report(days: int, json_output: bool):
                 else click.style("Present", fg="yellow")
             )
 
-            idx = click.style(f"{i:02d}.", fg="green")
+            idx = click.style(f"{i}.", fg="green")
             dur_str = click.style(f"({format_duration(duration)})", dim=True)
 
             task_desc = entry.task or click.style("no task", dim=True)
@@ -180,5 +180,60 @@ def analyze(days: int, json_output: bool):
             bar = click.style("█" * bar_len, fg=color)
 
         click.echo(f"{label}  {bar} {click.style(str(count), dim=True)}")
+
+    click.echo("")
+
+
+@click.command()
+@click.option(
+    "--days",
+    "-d",
+    default=1,
+    help="Number of days to list entries for (default: 7)",
+    type=int,
+)
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Output entries in JSON format",
+)
+def ls(days: int, json_output: bool):
+    """List all tracked time entries."""
+    entries = get_report_entries(days=days)
+
+    if json_output:
+        data = [_entry_to_dict(e) for e in entries]
+        click.echo(json.dumps(data, indent=2))
+        return
+
+    if not entries:
+        click.echo(
+            f"\nNo tracked time found for the last {days} day{'s' if days > 1 else ''}.\n"
+        )
+        return
+
+    click.echo("")
+    click.secho("📋 Time Entries", fg="blue", bold=True)
+    click.echo("=" * 20)
+
+    for i, entry in enumerate(entries, 1):
+        duration = get_entry_duration(entry)
+        date_str = click.style(entry.start_time.strftime("%Y-%m-%d"), dim=True)
+        start_str = entry.start_time.strftime("%H:%M")
+        end_str = (
+            entry.end_time.strftime("%H:%M")
+            if entry.end_time
+            else click.style("Present", fg="yellow")
+        )
+
+        idx = click.style(f"{i}.", fg="green")
+        dur_str = click.style(f"({format_duration(duration)})", dim=True)
+
+        task_desc = entry.task or click.style("no task", dim=True)
+
+        click.echo(
+            f"{idx} [{date_str}] {start_str} - {end_str} {dur_str} | {entry.project} | {task_desc}"
+        )
 
     click.echo("")

@@ -46,3 +46,30 @@ def read_entries(file_path: Path) -> List[LogItEntry]:
             entries.append(_dict_to_entry(data))
 
     return entries
+
+
+def replace_entry(
+    index: int,
+    updated_entry: LogItEntry,
+    file_path: Path,
+) -> None:
+    """
+    Replace a single LogItEntry in a JSONL file by index (1-based, latest-first).
+    """
+
+    if not file_path.exists():
+        raise FileNotFoundError("Log file does not exist")
+
+    entries = read_entries(file_path)
+
+    if index < 1 or index > len(entries):
+        raise IndexError("Entry index out of range")
+
+    real_index = len(entries) - index
+
+    entries[real_index] = updated_entry
+
+    with file_path.open("w", encoding="utf-8") as f:
+        for entry in entries:
+            json.dump(_entry_to_dict(entry), f)
+            f.write("\n")

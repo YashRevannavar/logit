@@ -62,7 +62,57 @@ LogIt will display a summary of the session:
 
 ---
 
-### 3. `logit report`
+### 3. `logit ls`
+List all individual time entries. This is useful for finding the index of an entry you want to edit.
+
+**Usage:**
+```bash
+logit ls [OPTIONS]
+```
+
+**Options:**
+- `-d, --days INTEGER`: Number of days to list (default: 7).
+- `--json`: Output entries in JSON format.
+
+**Example Output:**
+```text
+📋 Time Entries
+====================
+1. [2026-02-16] 09:00 - 10:30 (1h 30m) | Coding | Feature-A
+2. [2026-02-16] 11:00 - 12:00 (1h 00m) | Meeting | Sync
+```
+
+---
+
+### 4. `logit edit`
+Modify an existing time entry. Entries are identified by their index from `logit ls`. By default, it edits the most recent entry (index 1).
+
+**Usage:**
+```bash
+logit edit [INDEX] [OPTIONS]
+```
+
+**Options:**
+- `-p, --project TEXT`: Update the project name.
+- `-t, --task TEXT`: Update the task description.
+- `--start HH:MM`: Update the start time.
+- `--end HH:MM`: Update the end time.
+
+**Examples:**
+```bash
+# Edit the task of the most recent entry
+logit edit --task "Refactoring"
+
+# Edit the start time of the 3rd entry in the list
+logit edit 3 --start 08:30
+
+# Update both project and task
+logit edit 2 -p "New Project" -t "Initial Setup"
+```
+
+---
+
+### 5. `logit report`
 Generate a project-centric summary of your tracked time.
 
 **Usage:**
@@ -102,7 +152,7 @@ The report groups entries by project and lists tasks with their specific interva
 
 ---
 
-### 4. `logit analyze`
+### 6. `logit analyze`
 Take a deep dive into your productivity patterns.
 
 **Usage:**
@@ -142,7 +192,7 @@ Deep Focus (>1h)   ████████████████████�
 
 ---
 
-### 5. `logit --help`
+### 7. `logit --help`
 Need a quick reminder? You can always use the help flag to see available commands and options directly in your terminal.
 
 ```bash

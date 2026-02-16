@@ -4,7 +4,9 @@
 Designed to be simple, local-first, and developer-friendly.
 
 [![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+![logit demo](demo/logit-demo.gif)
 
 ---
 
@@ -14,7 +16,13 @@ If you just want to start tracking:
 
 ```bash
 # Start tracking
-logit start "coding" --tags canary
+logit start "coding" --task "auth-module"
+
+# List recent entries (to find an index)
+logit ls
+
+# Edit the last entry (index 1 is default)
+logit edit --task "api-refactor"
 
 # Stop tracking
 logit stop
@@ -25,8 +33,6 @@ logit report
 # Deep productivity analysis (last 30 days)
 logit analyze --days 30
 
-# Export report as JSON
-logit report --json
 ```
 
 ---
@@ -48,10 +54,11 @@ logit report --json
 - **Local-First**: All data stays on your machine (stored in `~/.logit_data.jsonl`).
 - **Terminal-Native**: Built for developers who live in the CLI.
 - **Tagging Support**: Organize your entries with custom tags.
-- **Floating Duration**: Running activities show real-time duration in reports.
+- **History Editing**: Easily fix mistakes in previous entries by index.
+- **Floating Duration**: Real-time duration for currently running activities.
 - **Visual Reports**: Project-centric summaries with tracked intervals and task details.
 - **Productivity Analysis**: Insightful metrics like "Deep Work Score" and "Session Distribution."
-- **JSON Output**: Machine-readable output for reports and analysis.
+- **JSON Output**: Machine-readable output for reports, listing, and analysis.
 - **Lightweight**: Zero fluff, just tracking.
 
 ---

@@ -1,5 +1,10 @@
 from datetime import datetime
-from logit.data_storage.data_store import save_entry, read_entries, save_entries
+from logit.data_storage.data_store import (
+    save_entry,
+    read_entries,
+    save_entries,
+    replace_entry,
+)
 from logit.utilities.models import user_config, LogItEntry, LogItStatus
 
 
@@ -40,3 +45,62 @@ def stop_command(
     except Exception as e:
         print(f"Error stopping activity: {e}")
         return None
+
+
+def edit_entry(
+    index: int,
+    project: str | None = None,
+    task: str | None = None,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+) -> LogItEntry:
+    """
+    Edit an existing LogItEntry by CLI index (1-based, latest-first).
+    """
+
+    entries = read_entries(user_config.store_data_at_path)
+
+    if not entries:
+        raise ValueError("No entries available to edit.")
+
+    if index < 1 or index > len(entries):
+        raise IndexError("Entry index out of range")
+
+    real_index = len(entries) - index
+    entry = entries[real_index]
+
+    if project is not None:
+        entry.project = project
+
+    if task is not None:
+        entry.task = task
+
+    if start_time is not None:
+        entry.start_time = entry.start_time.replace(
+            hour=start_time.hour,
+            minute=start_time.minute,
+            second=0,
+            microsecond=0,
+        )
+
+    if end_time is not None:
+        if entry.end_time is None:
+            raise ValueError("Cannot set end time on a running entry.")
+
+        entry.end_time = entry.end_time.replace(
+            hour=end_time.hour,
+            minute=end_time.minute,
+            second=0,
+            microsecond=0,
+        )
+
+    if entry.end_time and entry.end_time < entry.start_time:
+        raise ValueError("End time cannot be before start time.")
+
+    replace_entry(
+        index=index,
+        updated_entry=entry,
+        file_path=user_config.store_data_at_path,
+    )
+
+    return entry

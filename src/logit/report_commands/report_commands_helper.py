@@ -17,9 +17,10 @@ def get_report_entries(days: int = 1) -> list[LogItEntry]:
         entries = read_entries(user_config.store_data_at_path)
         today = datetime.now().date()
         start_date = today - timedelta(days=days - 1)
-
-        # Filter entries by start_time date
-        return [entry for entry in entries if entry.start_time.date() >= start_date]
+        filtered_list = [
+            entry for entry in entries if entry.start_time.date() >= start_date
+        ]
+        return filtered_list[::-1]
     except Exception as e:
         print(f"Error fetching report entries: {e}")
         return []
