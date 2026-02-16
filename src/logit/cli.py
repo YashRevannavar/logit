@@ -7,7 +7,7 @@ def cli():
 
 
 # Import and register commands from other services
-from logit.control_commands.control_commands_service import start, stop  # noqa
+from logit.control_commands.control_commands_service import start, stop, edit  # noqa
 from logit.report_commands.report_commands_service import (  # noqa
     report,
     analyze,
@@ -19,7 +19,4 @@ cli.add_command(cmd=stop)
 cli.add_command(cmd=report)
 cli.add_command(cmd=analyze)
 cli.add_command(cmd=ls)
-
-
-# TODO: Add edit command
-# Example: logit edit --id <entry_id> --project "New Project Name" --task "New Task Name"
+cli.add_command(cmd=edit)
