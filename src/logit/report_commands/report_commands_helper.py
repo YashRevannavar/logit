@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from collections import defaultdict
 from typing import Optional
 from logit.data_storage.data_store import read_entries
@@ -11,15 +11,23 @@ from logit.utilities.models import (
 )
 
 
-def get_report_entries(days: int = 1) -> list[LogItEntry]:
-    """Get all entries from the last n days."""
+def get_report_entries(
+    days: Optional[int] = None, target_date: Optional[date] = None
+) -> list[LogItEntry]:
+    """Get all entries, either for the last n days or for a specific date."""
     try:
         entries = read_entries(user_config.store_data_at_path)
-        today = datetime.now().date()
-        start_date = today - timedelta(days=days - 1)
-        filtered_list = [
-            entry for entry in entries if entry.start_time.date() >= start_date
-        ]
+        if target_date:
+            filtered_list = [
+                entry for entry in entries if entry.start_time.date() == target_date
+            ]
+        else:
+            days = days or 1
+            today = datetime.now().date()
+            start_date = today - timedelta(days=days - 1)
+            filtered_list = [
+                entry for entry in entries if entry.start_time.date() >= start_date
+            ]
         return filtered_list[::-1]
     except Exception as e:
         print(f"Error fetching report entries: {e}")
