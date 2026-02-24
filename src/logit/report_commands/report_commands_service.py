@@ -7,6 +7,7 @@ from logit.report_commands.report_commands_helper import (
     get_report_entries,
     get_entry_duration,
     get_productivity_metrics,
+    FLEXIBLE_DATE,
 )
 from logit.utilities.models import _entry_to_dict
 from logit.utilities.display_utils import format_duration
@@ -23,8 +24,8 @@ from logit.utilities.display_utils import format_duration
 @click.option(
     "--date",
     "-dt",
-    help="Filter entries for a specific date (DD-MM-YY)",
-    type=click.DateTime(formats=["%d-%m-%y"]),
+    help="Filter entries for a specific date (DD, DD-MM, or DD-MM-YY)",
+    type=FLEXIBLE_DATE,
 )
 @click.option(
     "--json",
@@ -115,8 +116,8 @@ def report(days: int, date: datetime, json_output: bool):
 @click.option(
     "--date",
     "-dt",
-    help="Filter entries for a specific date (DD-MM-YY)",
-    type=click.DateTime(formats=["%d-%m-%y"]),
+    help="Filter entries for a specific date (DD, DD-MM, or DD-MM-YY)",
+    type=FLEXIBLE_DATE,
 )
 @click.option(
     "--json",
@@ -219,8 +220,8 @@ def analyze(days: int, date: datetime, json_output: bool):
 @click.option(
     "--date",
     "-dt",
-    help="Filter entries for a specific date (DD-MM-YY)",
-    type=click.DateTime(formats=["%d-%m-%y"]),
+    help="Filter entries for a specific date (DD, DD-MM, or DD-MM-YY)",
+    type=FLEXIBLE_DATE,
 )
 @click.option(
     "--json",

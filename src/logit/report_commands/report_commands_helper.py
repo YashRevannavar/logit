@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta, date
 from collections import defaultdict
 from typing import Optional
+
+import click
+
 from logit.data_storage.data_store import read_entries
 from logit.utilities.models import (
     user_config,
@@ -129,3 +132,33 @@ def get_productivity_metrics(
         context_switches=context_switches,
         distribution=distribution,
     )
+
+
+class FlexibleDateParamType(click.ParamType):
+    name = "date"
+
+    def convert(self, value, param, ctx):
+        if value is None or isinstance(value, datetime):
+            return value
+
+        now = datetime.now()
+        try:
+            if "-" in value:
+                parts = value.split("-")
+                if len(parts) == 3:
+                    return datetime.strptime(value, "%d-%m-%y")
+                elif len(parts) == 2:
+                    dt = datetime.strptime(value, "%d-%m")
+                    return dt.replace(year=now.year)
+            else:
+                dt = datetime.strptime(value, "%d")
+                return dt.replace(year=now.year, month=now.month)
+        except ValueError:
+            self.fail(
+                f"'{value}' is not a valid date format. Use DD, DD-MM, or DD-MM-YY.",
+                param,
+                ctx,
+            )
+
+
+FLEXIBLE_DATE = FlexibleDateParamType()
