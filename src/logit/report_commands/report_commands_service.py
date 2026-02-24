@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta
+from datetime import timedelta, datetime
 from collections import defaultdict
 import click
 
@@ -7,6 +7,7 @@ from logit.report_commands.report_commands_helper import (
     get_report_entries,
     get_entry_duration,
     get_productivity_metrics,
+    FLEXIBLE_DATE,
 )
 from logit.utilities.models import _entry_to_dict
 from logit.utilities.display_utils import format_duration
@@ -21,14 +22,21 @@ from logit.utilities.display_utils import format_duration
     type=int,
 )
 @click.option(
+    "--date",
+    "-dt",
+    help="Filter entries for a specific date (DD, DD-MM, or DD-MM-YY)",
+    type=FLEXIBLE_DATE,
+)
+@click.option(
     "--json",
     "json_output",
     is_flag=True,
     help="Output report in JSON format",
 )
-def report(days: int, json_output: bool):
+def report(days: int, date: datetime, json_output: bool):
     """Show a compact time tracking report."""
-    entries = get_report_entries(days=days)
+    target_date = date.date() if date else None
+    entries = get_report_entries(days=days, target_date=target_date)
 
     if json_output:
         data = [_entry_to_dict(e) for e in entries]
@@ -36,9 +44,14 @@ def report(days: int, json_output: bool):
         return
 
     if not entries:
-        click.echo(
-            f"\nNo tracked time found for the last {days} day{'s' if days > 1 else ''}.\n"
-        )
+        if target_date:
+            click.echo(
+                f"\nNo tracked time found for {target_date.strftime('%d-%m-%y')}.\n"
+            )
+        else:
+            click.echo(
+                f"\nNo tracked time found for the last {days} day{'s' if days > 1 else ''}.\n"
+            )
         return
 
     click.echo("")
@@ -101,14 +114,21 @@ def report(days: int, json_output: bool):
     type=int,
 )
 @click.option(
+    "--date",
+    "-dt",
+    help="Filter entries for a specific date (DD, DD-MM, or DD-MM-YY)",
+    type=FLEXIBLE_DATE,
+)
+@click.option(
     "--json",
     "json_output",
     is_flag=True,
     help="Output analysis in JSON format",
 )
-def analyze(days: int, json_output: bool):
+def analyze(days: int, date: datetime, json_output: bool):
     """Analyze productivity and focus quality."""
-    entries = get_report_entries(days=days)
+    target_date = date.date() if date else None
+    entries = get_report_entries(days=days, target_date=target_date)
     metrics = get_productivity_metrics(entries)
 
     if json_output:
@@ -119,7 +139,12 @@ def analyze(days: int, json_output: bool):
         return
 
     if not metrics:
-        click.echo(f"\nNo data to analyze for the last {days} days.\n")
+        if target_date:
+            click.echo(
+                f"\nNo data to analyze for {target_date.strftime('%d-%m-%y')}.\n"
+            )
+        else:
+            click.echo(f"\nNo data to analyze for the last {days} days.\n")
         return
 
     # Header
@@ -193,14 +218,21 @@ def analyze(days: int, json_output: bool):
     type=int,
 )
 @click.option(
+    "--date",
+    "-dt",
+    help="Filter entries for a specific date (DD, DD-MM, or DD-MM-YY)",
+    type=FLEXIBLE_DATE,
+)
+@click.option(
     "--json",
     "json_output",
     is_flag=True,
     help="Output entries in JSON format",
 )
-def ls(days: int, json_output: bool):
+def ls(days: int, date: datetime, json_output: bool):
     """List all tracked time entries."""
-    entries = get_report_entries(days=days)
+    target_date = date.date() if date else None
+    entries = get_report_entries(days=days, target_date=target_date)
 
     if json_output:
         data = [_entry_to_dict(e) for e in entries]
@@ -208,9 +240,14 @@ def ls(days: int, json_output: bool):
         return
 
     if not entries:
-        click.echo(
-            f"\nNo tracked time found for the last {days} day{'s' if days > 1 else ''}.\n"
-        )
+        if target_date:
+            click.echo(
+                f"\nNo tracked time found for {target_date.strftime('%d-%m-%y')}.\n"
+            )
+        else:
+            click.echo(
+                f"\nNo tracked time found for the last {days} day{'s' if days > 1 else ''}.\n"
+            )
         return
 
     click.echo("")

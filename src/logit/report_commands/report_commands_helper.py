@@ -1,6 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from collections import defaultdict
 from typing import Optional
+
+import click
+
 from logit.data_storage.data_store import read_entries
 from logit.utilities.models import (
     user_config,
@@ -11,15 +14,23 @@ from logit.utilities.models import (
 )
 
 
-def get_report_entries(days: int = 1) -> list[LogItEntry]:
-    """Get all entries from the last n days."""
+def get_report_entries(
+    days: Optional[int] = None, target_date: Optional[date] = None
+) -> list[LogItEntry]:
+    """Get all entries, either for the last n days or for a specific date."""
     try:
         entries = read_entries(user_config.store_data_at_path)
-        today = datetime.now().date()
-        start_date = today - timedelta(days=days - 1)
-        filtered_list = [
-            entry for entry in entries if entry.start_time.date() >= start_date
-        ]
+        if target_date:
+            filtered_list = [
+                entry for entry in entries if entry.start_time.date() == target_date
+            ]
+        else:
+            days = days or 1
+            today = datetime.now().date()
+            start_date = today - timedelta(days=days - 1)
+            filtered_list = [
+                entry for entry in entries if entry.start_time.date() >= start_date
+            ]
         return filtered_list[::-1]
     except Exception as e:
         print(f"Error fetching report entries: {e}")
@@ -121,3 +132,33 @@ def get_productivity_metrics(
         context_switches=context_switches,
         distribution=distribution,
     )
+
+
+class FlexibleDateParamType(click.ParamType):
+    name = "date"
+
+    def convert(self, value, param, ctx):
+        if value is None or isinstance(value, datetime):
+            return value
+
+        now = datetime.now()
+        try:
+            if "-" in value:
+                parts = value.split("-")
+                if len(parts) == 3:
+                    return datetime.strptime(value, "%d-%m-%y")
+                elif len(parts) == 2:
+                    dt = datetime.strptime(value, "%d-%m")
+                    return dt.replace(year=now.year)
+            else:
+                dt = datetime.strptime(value, "%d")
+                return dt.replace(year=now.year, month=now.month)
+        except ValueError:
+            self.fail(
+                f"'{value}' is not a valid date format. Use DD, DD-MM, or DD-MM-YY.",
+                param,
+                ctx,
+            )
+
+
+FLEXIBLE_DATE = FlexibleDateParamType()
