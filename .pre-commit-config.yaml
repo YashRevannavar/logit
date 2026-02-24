@@ -1,0 +1,39 @@
+exclude: \.gif$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: autoflake
+        name: autoflake (remove unused imports & variables)
+        entry: autoflake --in-place --remove-all-unused-imports --remove-unused-variables
+        language: system
+        types: [ python ]
+        pass_filenames: true
+
+      - id: pre-push-tests
+        name: Run CI tests on push
+        entry: backend/tests/ci/run_ci.sh
+
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+
+    hooks:
+      - id: black
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: [ "--ignore=E501,W503,E266" ]
